@@ -14,10 +14,12 @@ CorBranco = (255, 255, 255)
 
 # Fonte ------
 Fonte = pygame.font.SysFont("Comic Sans", pygame.SCALED // 10, True)
-Fonte2 = pygame.font.SysFont("none", pygame.SCALED // 10, False)
+Fonte2 = pygame.font.SysFont("none", 300, False)
 
 # muscias ----------------------------------------------------------------------
 pygame.mixer.init()
+def ResetM():
+    pygame.mixer.music.play(-1)
 M1 = '109. Graveyard Ops Combat A High loop.mp3'
 M2 = '121. Graveyard Ops Combat B High loop.mp3'
 M3 = '129. Graveyard Ops Combat C High loop.mp3'
@@ -40,26 +42,21 @@ pygame.display.set_caption("Tela")
 Clock = pygame.time.Clock()
 
 # Outros -----------------------------------------------------------------------------------
-Objeto = pygame.Rect(21, 121, 100, 100)
 TC = CorVermelho
 Pausado = False
 Infor = pygame.display.get_desktop_sizes()
+y = 300
+x = 300
+Objeto = pygame.Rect(x, y, 100, 100)
 
 # Sistema --------------------------------------------------------------------------------
 Run = True
 while Run:
     for evento in pygame.event.get():
-        if evento.type == pygame.QUIT:
+        if evento.type == pygame.QUIT or evento.type == pygame.KEYDOWN and evento.key == pygame.K_SPACE:
             Run = False
-        if evento.type == pygame.KEYDOWN:
-            if evento.key == pygame.K_SPACE:
-                Run = False
 
          # Click Mouse/Teclado + Musica
-
-        def ResetM():
-            pygame.mixer.music.play(-1)
-
         if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
             if Objeto.collidepoint(evento.pos):
                 if TC == CorVermelho:
@@ -71,7 +68,6 @@ while Run:
                     pygame.mixer.music.stop()
 
     # Pausar e despausar a musica
-
         if evento.type == pygame.KEYDOWN and evento.key == pygame.K_1:
             if Pausado == False and TC == CorVerde:
                 Pausado = True
@@ -111,6 +107,22 @@ while Run:
             if evento.key == pygame.K_F11:
                 pygame.display.toggle_fullscreen()
 
+        Teclas = pygame.key.get_pressed()
+
+    if Teclas[pygame.K_w]:
+        y -= 20
+    if Teclas[pygame.K_s]:
+        y += 20
+    if Teclas[pygame.K_a]:
+        x -= 20
+    if Teclas[pygame.K_d]:
+        x += 20
+
+    x = max(20, min(x, 1800 - 120))
+    y = max(20, min(y, 900 - 120))
+
+    Objeto.x = x
+    Objeto.y = y
 # Mensagem ------------------------------------------------------------------------------------
 
     #_Texto1 = Monitor
@@ -120,7 +132,7 @@ while Run:
     telaP.blit(Texto, TCentro)
 
     #_Texto2 = Tempo
-    if(tempoS == -1):
+    if tempoS == -1:
         tempoS = temp_aux
 
     Texto2 = Fonte.render(f"Segundos: {tempoS}", True, CorBranco)
@@ -140,7 +152,7 @@ while Run:
     telaP.fill((0, 0, 0))
     cubo = pygame.draw.rect(telaP, CorAzul, (0, 0, posX, posY), 20)
     pygame.draw.rect(telaP, TC, Objeto)
-    Clock.tick(30)
+    Clock.tick(120)
 
 pygame.quit()
 sys.exit()
