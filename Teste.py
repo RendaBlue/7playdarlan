@@ -17,7 +17,7 @@ corB = ((255, 255, 255))
 alvoPosicao = (100, 100)
 #alvo = pygame.Rect((alvoPosicao), (1800/10, 900/10))
 
-# Eventos
+# Eventos Mouse
 run = True
 while run:
     for evento in pygame.event.get():
