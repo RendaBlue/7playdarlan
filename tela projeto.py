@@ -1,7 +1,7 @@
 import pygame
+from mutagen.mp3 import MP3
 import sys
-#import time
-#import os
+import os
 
 pygame.init()
 
@@ -11,43 +11,48 @@ CorVerde = (0, 255, 0)
 CorVermelho = (255, 0, 0)
 CorPreto = (0, 0, 0)
 CorBranco = (255, 255, 255)
+CorCiano = (0, 255, 255)
+CorCinza = (100, 100, 100)
 
 # Fonte ------
-Fonte = pygame.font.SysFont("Comic Sans", pygame.SCALED // 10, True)
-Fonte2 = pygame.font.SysFont("none", 300, False)
+Fonte = pygame.font.SysFont("Comic Sans", 50, True)
+Fonte2 = pygame.font.SysFont("none", 100, False)
 
 # muscias ----------------------------------------------------------------------
 pygame.mixer.init()
+ResetMusic = pygame.USEREVENT
+pygame.mixer.music.set_endevent(ResetMusic)
 def ResetM():
     pygame.mixer.music.play(-1)
-M1 = '109. Graveyard Ops Combat A High loop.mp3'
-M2 = '121. Graveyard Ops Combat B High loop.mp3'
-M3 = '129. Graveyard Ops Combat C High loop.mp3'
-musicas = [M1, M2, M3]
+Pmusicas = "../musicas/"
+
+musicas = [
+    os.path.join(Pmusicas, musica)
+    for musica in os.listdir(Pmusicas)
+    if musica.endswith(".mp3")
+]
 LM = 0
+ListMusic = os.path.basename(musicas[0])
 Volume = 0.5
 pygame.mixer.music.set_volume(Volume)
 pygame.mixer.music.load(musicas[LM])
-Tempo = pygame.mixer.music.get_pos()
-tempoS = Tempo // 1000
-temp_aux = 0
 
 # Tela Codigo ----------------------------------------------------------------------------
 Info = pygame.display.Info()
 TamanhoTela = (Info.current_w, Info.current_h)
 
 # Tela Principal ------------------------------------------------------------------------
-telaP = pygame.display.set_mode((1800, 900), pygame.RESIZABLE)
+telaP = pygame.display.set_mode((1280, 720))
 pygame.display.set_caption("Tela")
 Clock = pygame.time.Clock()
+Tempo = 0
+UPos = 0
 
 # Outros -----------------------------------------------------------------------------------
 TC = CorVermelho
 Pausado = False
 Infor = pygame.display.get_desktop_sizes()
-y = 300
-x = 300
-Objeto = pygame.Rect(x, y, 100, 100)
+Objeto = pygame.Rect(10, 110, 300, 300)
 
 # Sistema --------------------------------------------------------------------------------
 Run = True
@@ -61,7 +66,7 @@ while Run:
             if Objeto.collidepoint(evento.pos):
                 if TC == CorVermelho:
                     TC = CorVerde
-                    pygame.mixer.music.play(-1)
+                    pygame.mixer.music.play()
                     Pausado = False
                 else:
                     TC = CorVermelho
@@ -69,29 +74,37 @@ while Run:
 
     # Pausar e despausar a musica
         if evento.type == pygame.KEYDOWN and evento.key == pygame.K_1:
-            if Pausado == False and TC == CorVerde:
-                Pausado = True
-                pygame.mixer.music.pause()
-            else:
-                Pausado = False
-                pygame.mixer.music.unpause()
+            if TC == CorVerde:
+                if not Pausado:
+                    Pausado = True
+                    pygame.mixer.music.pause()
+                else:
+                    Pausado = False
+                    pygame.mixer.music.unpause()
 
     # Resetar musica
         if evento.type == pygame.KEYDOWN and evento.key == pygame.K_q:
-            pygame.mixer.music.rewind()
+            if TC == CorVerde and Pausado == False:
+                pygame.mixer.music.play()
 
     # Troca a musica
         if evento.type == pygame.KEYDOWN and evento.key == pygame.K_DOWN:
             LM = (LM + 1) % len(musicas)
             pygame.mixer.music.load(musicas[LM])
             if TC == CorVerde:
-                pygame.mixer.music.play(-1)
+                pygame.mixer.music.play()
 
         if evento.type == pygame.KEYDOWN and evento.key == pygame.K_UP:
             LM = (LM - 1) % len(musicas)
             pygame.mixer.music.load(musicas[LM])
             if TC == CorVerde:
-                pygame.mixer.music.play(-1)
+                pygame.mixer.music.play()
+
+        if evento.type == ResetMusic and not TC == CorVermelho:
+            LM = (LM + 1) % len(musicas)
+            pygame.mixer.music.load(musicas[LM])
+            if TC == CorVerde:
+                pygame.mixer.music.play()
 
     # Volume da musica
         if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 4:
@@ -102,55 +115,43 @@ while Run:
             Volume = max(Volume - 0.1, 0.1)
             pygame.mixer.music.set_volume(Volume)
 
-        # Tela Cheia -----------------------------------------------------------------------------
-        if evento.type == pygame.KEYDOWN:
-            if evento.key == pygame.K_F11:
-                pygame.display.toggle_fullscreen()
-
-        Teclas = pygame.key.get_pressed()
-
-    if Teclas[pygame.K_w]:
-        y -= 20
-    if Teclas[pygame.K_s]:
-        y += 20
-    if Teclas[pygame.K_a]:
-        x -= 20
-    if Teclas[pygame.K_d]:
-        x += 20
-
-    x = max(20, min(x, 1800 - 120))
-    y = max(20, min(y, 900 - 120))
-
-    Objeto.x = x
-    Objeto.y = y
 # Mensagem ------------------------------------------------------------------------------------
 
-    #_Texto1 = Monitor
-    Tnome = "Tamanho do monitor: " + (str(Infor)).replace("(","").replace(")", "").replace(",", " x").replace("[","").replace("]","")
+    #_Texto1 = Musica atual
+    Tnome = os.path.splitext(os.path.basename(musicas[LM]))[0]
     Texto = Fonte.render(Tnome, True, CorBranco)
-    TCentro = Texto.get_rect(center=(470, 50))
-    telaP.blit(Texto, TCentro)
+    telaP.blit(Texto, (30,20))
 
-    #_Texto2 = Tempo
-    if tempoS == -1:
-        tempoS = temp_aux
-
-    Texto2 = Fonte.render(f"Segundos: {tempoS}", True, CorBranco)
-    temp_aux = tempoS
-    TCentro2 = Texto2.get_rect(center=(300, 820))
-    telaP.blit(Texto2, TCentro2)
-
-    #_Texto3 = Pausado (ON/OFF)
+    # _Texto2 = Pausado (ON/OFF)
     NomePause = "Pausado"
     Texto3 = Fonte2.render(NomePause, True, CorVermelho)
+    TCentro = Texto3.get_rect(center=(1100, 655))
     if Pausado == True and TC == CorVerde:
-        telaP.blit(Texto3, (200, 200))
+        telaP.blit(Texto3, TCentro)
+
+    #_Texto3 = Tempo
+    pos = max(0, pygame.mixer.music.get_pos()) // 1000
+    minutos = int(pos // 60)
+    segundos = int(pos % 60)
+    Texto2 = Fonte.render(f"Tempo:{minutos:02}:{segundos:02}/", True, CorBranco)
+    TCentro2 = Texto2.get_rect(center=(220, 650))
+    telaP.blit(Texto2, TCentro2)
+
+    T1 = MP3(musicas[LM]).info.length
+    T1minutos = int(T1 // 60)
+    T1segundos = int(T1 % 60)
+    Texto2 = Fonte.render(f"{T1minutos:02}:{T1segundos:02}", True, CorCinza)
+    TCentro2 = Texto2.get_rect(center=(470 , 650))
+    telaP.blit(Texto2, TCentro2)
 
 # Atulização ------------------------------------------------------------------------------------
     pygame.display.flip()
     posX, posY = telaP.get_size()
-    telaP.fill((0, 0, 0))
-    cubo = pygame.draw.rect(telaP, CorAzul, (0, 0, posX, posY), 20)
+    telaP.fill((CorCinza))
+    pygame.draw.line(telaP, CorPreto, (10, 60), (posX, 60), 100)
+    pygame.draw.line(telaP, CorPreto, (10, 660), (posX, 66 0), 100)
+    pygame.draw.rect(telaP, CorAzul, (0, 0, posX, posY), 10)
+    pygame.draw.rect(telaP, CorBranco, (10, 410, 300, 200))
     pygame.draw.rect(telaP, TC, Objeto)
     Clock.tick(120)
 

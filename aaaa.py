@@ -9,7 +9,7 @@ font = pygame.font.SysFont("Arial", 30)
 
 # Carregar e tocar música
 # Substitua 'sua_musica.mp3' pelo caminho do seu arquivo
-pygame.mixer.music.load('129. Graveyard Ops Combat C High loop.mp3')
+pygame.mixer.music.load('../musicas/129. Graveyard Ops Combat C High loop.mp3')
 pygame.mixer.music.play()
 
 running = True

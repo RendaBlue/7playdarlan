@@ -1,56 +1,25 @@
 import pygame
-import sys
 
+# Inicialização
 pygame.init()
-Tela = pygame.display.set_mode((1200, 800),pygame.RESIZABLE)
-clock = pygame.time.Clock()
+tela = pygame.display.set_mode((400, 300))
+preto = (0, 0, 0)
+branco = (255, 255, 255)
 
-x, y = 100, 100
-x2 = 100
-y2 = 100
-Vel = 10
+# Preencher o fundo de branco para a linha aparecer
+tela.fill(branco)
 
-corRosa = (255, 255, 255, 155)
-corBranco = (255, 255, 255)
+# Desenhar linha: superfície, cor, (x_inicio, y_inicio), (x_fim, y_fim), espessura
+pygame.draw.line(tela, preto, (0, 50), (300, 50), 20)
 
-Run = True
-while Run:
-    for evento in pygame.event.get():
-        if evento.type == pygame.QUIT or evento.type == pygame.KEYDOWN and evento.key == pygame.K_F11:
-                Run = False
+# Atualizar a tela
+pygame.display.flip()
 
-    Teclas = pygame.key.get_pressed()
-
-    if Teclas[pygame.K_UP]:
-        y -= Vel
-    if Teclas[pygame.K_DOWN]:
-        y += Vel
-    if Teclas[pygame.K_LEFT]:
-        x -= Vel
-    if Teclas[pygame.K_RIGHT]:
-        x += Vel
-
-    if Teclas[pygame.K_w]:
-        y2 -= Vel
-    if Teclas[pygame.K_s]:
-        y2 += Vel
-    if Teclas[pygame.K_a]:
-        x2 -= Vel
-    if Teclas[pygame.K_d]:
-        x2 += Vel
-
-    x2 = max(60, min(x2, 1200))
-    y2 = max(60, min(y2, 800))
-
-    x = max(0, min(x, 1200 - x2))
-    y = max(0, min(y, 800 - y2))
-
-    pygame.display.flip()
-    Tela.fill((0, 0, 0))
-    Objeto = pygame.Rect(x, y, x2, y2)
-    pygame.draw.rect(Tela, corRosa, Objeto,20)
-
-    clock.tick(60)
+# Loop para manter a janela aberta
+rodando = True
+while rodando:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            rodando = False
 
 pygame.quit()
-sys.exit()
