@@ -120,12 +120,12 @@ while Run:
     #_Texto1 = Musica atual
     Tnome = os.path.splitext(os.path.basename(musicas[LM]))[0]
     Texto = Fonte.render(Tnome, True, CorBranco)
-    telaP.blit(Texto, (30,20))
+    telaP.blit(Texto, (30,10))
 
     # _Texto2 = Pausado (ON/OFF)
     NomePause = "Pausado"
     Texto3 = Fonte2.render(NomePause, True, CorVermelho)
-    TCentro = Texto3.get_rect(center=(1100, 655))
+    TCentro = Texto3.get_rect(center=(1100, 665))
     if Pausado == True and TC == CorVerde:
         telaP.blit(Texto3, TCentro)
 
@@ -134,23 +134,25 @@ while Run:
     minutos = int(pos // 60)
     segundos = int(pos % 60)
     Texto2 = Fonte.render(f"Tempo:{minutos:02}:{segundos:02}/", True, CorBranco)
-    TCentro2 = Texto2.get_rect(center=(220, 650))
+    TCentro2 = Texto2.get_rect(center=(220, 660))
     telaP.blit(Texto2, TCentro2)
 
     T1 = MP3(musicas[LM]).info.length
     T1minutos = int(T1 // 60)
     T1segundos = int(T1 % 60)
     Texto2 = Fonte.render(f"{T1minutos:02}:{T1segundos:02}", True, CorCinza)
-    TCentro2 = Texto2.get_rect(center=(470 , 650))
+    TCentro2 = Texto2.get_rect(center=(470 , 660))
     telaP.blit(Texto2, TCentro2)
 
 # Atulização ------------------------------------------------------------------------------------
     pygame.display.flip()
     posX, posY = telaP.get_size()
-    telaP.fill((CorCinza))
-    pygame.draw.line(telaP, CorPreto, (10, 60), (posX, 60), 100)
-    pygame.draw.line(telaP, CorPreto, (10, 660), (posX, 660), 100)
+    telaP.fill(CorCinza)
+    pygame.draw.line(telaP, CorPreto, (10, 50), (posX, 50), 100) # Linha Preta Cima
+    pygame.draw.line(telaP, CorPreto, (10, 660), (posX, 660), 100) # Linha Preta Baixo
+    pygame.draw.line(telaP, CorAzul, (315, 110), (315,  610), 10) # Linha Azul Meio Esquerda
     pygame.draw.rect(telaP, CorAzul, (0, 0, posX, posY), 10)
+    pygame.draw.rect(telaP, CorAzul, (0, 100, posX, posY-200), 10)
     pygame.draw.rect(telaP, CorBranco, (10, 410, 300, 200))
     pygame.draw.rect(telaP, TC, Objeto)
     Clock.tick(120)
