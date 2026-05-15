@@ -149,7 +149,7 @@ while Run:
     posX, posY = telaP.get_size()
     telaP.fill((CorCinza))
     pygame.draw.line(telaP, CorPreto, (10, 60), (posX, 60), 100)
-    pygame.draw.line(telaP, CorPreto, (10, 660), (posX, 66 0), 100)
+    pygame.draw.line(telaP, CorPreto, (10, 660), (posX, 660), 100)
     pygame.draw.rect(telaP, CorAzul, (0, 0, posX, posY), 10)
     pygame.draw.rect(telaP, CorBranco, (10, 410, 300, 200))
     pygame.draw.rect(telaP, TC, Objeto)
