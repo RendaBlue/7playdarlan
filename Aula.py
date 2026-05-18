@@ -10,7 +10,7 @@ branco = (255, 255, 255)
 tela.fill(branco)
 
 # Desenhar linha: superfície, cor, (x_inicio, y_inicio), (x_fim, y_fim), espessura
-pygame.draw.line(tela, preto, (300, 0), (300, 500), 20)
+pygame.draw.line(tela, preto, (350, 100), (250, 200), 50)
 # Atualizar a tela
 pygame.display.flip()
 
