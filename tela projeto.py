@@ -17,7 +17,7 @@ CorCinza = (100, 100, 100)
 # Fonte ------
 Fonte = pygame.font.SysFont("Comic Sans", 50, True)
 Fonte2 = pygame.font.SysFont("none", 100, False)
-Fonte3 = pygame.font.SysFont("Arial", 40, True)
+Fonte3 = pygame.font.SysFont("Arial", 30, True)
 
 # muscias ----------------------------------------------------------------------
 pygame.mixer.init()
@@ -90,16 +90,6 @@ while Run:
 
                     break
 
-#        if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
-#            if Objeto.collidepoint(evento.pos):
-#                if TC == CorVermelho:
-#                    TC = CorVerde
-#                    pygame.mixer.music.play()
-#                    Pausado = False
-#                else:
-#                    TC = CorVermelho
-#                    pygame.mixer.music.stop()
-
     # Pausar e despausar a musica
         if evento.type == pygame.KEYDOWN and evento.key == pygame.K_1:
             if TC == CorVerde:
@@ -135,6 +125,7 @@ while Run:
                 pygame.mixer.music.play()
 
     # Volume da musica
+
         if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 4:
             Volume = min(Volume + 0.1, 1.0)
             pygame.mixer.music.set_volume(Volume)
@@ -157,24 +148,19 @@ while Run:
         if i == LM:
             MusicCor = CorVermelho
         else:
-            MusicCor = CorBranco
+            MusicCor = CorCiano
         TextoT2 = Fonte3.render(T2nome, True, MusicCor)
         PosMusic = (330, Tpy)
         telaP.blit(TextoT2, PosMusic)
         RectTexto = TextoT2.get_rect(topleft=PosMusic)
         RectMusic.append((RectTexto, i))
-        Tpy += 55
+        Tpy += 40
 
 
 
     # _Texto2 = Pausado (ON/OFF)
     NomePause = "Pausado"
     Texto3 = Fonte2.render(NomePause, True, CorVermelho)
-    #if Pausado == True and TC == CorVerde:
-    #    telaP.blit(Texto3, (15, 535))
-
-    #_Texto3 = Tempo
-    #pos = max(0, pygame.mixer.music.get_pos()) // 1000
     pos = pygame.mixer.music.get_pos() / 1000
 
     if pos < 0:
@@ -184,8 +170,8 @@ while Run:
     T1 = MP3(musicas[LM]).info.length
     T1minutos = int(T1 // 60)
     T1segundos = int(T1 % 60)
-    TextoT1 = Fonte.render(f"{minutos:02}:{segundos:02}", True, CorPreto)
-    TextoT2 = Fonte.render(f"{T1minutos:02}:{T1segundos:02}", True, CorPreto)
+    TextoT1 = Fonte.render(f"{minutos:02}:{segundos:02}", True, CorBranco)
+    TextoT2 = Fonte.render(f"{T1minutos:02}:{T1segundos:02}", True, CorBranco)
     #telaP.blit(TextoT1, (20, 410))
     #telaP.blit(TextoT2, (20, 460))
 
@@ -198,7 +184,7 @@ while Run:
     pygame.draw.rect(telaP, CorAzul, (0, 0, posX, posY), 10)
     pygame.draw.rect(telaP, CorAzul, (0, 100, posX, posY-200), 10)
     pygame.draw.rect(telaP, CorCiano, (10, 420, 300, 190))
-    pygame.draw.rect(telaP, TC, Objeto, 25)
+    pygame.draw.rect(telaP, TC, Objeto)
 
 
     pygame.draw.rect(telaP, TC, Objeto, 25)
@@ -208,8 +194,8 @@ while Run:
     telaP.blit(Texto, (30, 10))
 
     # Tempo
-    telaP.blit(TextoT1, (20, 410))
-    telaP.blit(TextoT2, (20, 460))
+    telaP.blit(TextoT1, (20, 625))
+    telaP.blit(TextoT2, (posX-170, 625))
 
     # Pausado
     if Pausado and TC == CorVerde:
