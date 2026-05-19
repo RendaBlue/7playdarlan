@@ -17,7 +17,7 @@ CorCinza = (100, 100, 100)
 # Fonte ------
 Fonte = pygame.font.SysFont("Comic Sans", 50, True)
 Fonte2 = pygame.font.SysFont("none", 100, False)
-Fonte3 = pygame.font.SysFont("Arial", 30, True)
+Fonte3 = pygame.font.SysFont("Arial", 35, True)
 
 # muscias ----------------------------------------------------------------------
 pygame.mixer.init()
@@ -45,11 +45,12 @@ TamanhoTela = (Info.current_w, Info.current_h)
 
 # Tela Principal ------------------------------------------------------------------------
 telaP = pygame.display.set_mode((1280, 720))
-
 pygame.display.set_caption("Tela")
 Clock = pygame.time.Clock()
 Tempo = 0
 UPos = 0
+Scroll = 0
+VelScroll = 30
 
 # Outros -----------------------------------------------------------------------------------
 TC = CorVermelho
@@ -64,6 +65,18 @@ while Run:
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT or evento.type == pygame.KEYDOWN and evento.key == pygame.K_SPACE:
             Run = False
+
+        if evento.type == pygame.KEYDOWN and evento.key == pygame.K_r:
+            musicas = [
+        os.path.join(Pmusicas, musica)
+        for musica in os.listdir(Pmusicas)
+        if musica.endswith(".mp3")
+        ]
+        if evento.type == pygame.MOUSEWHEEL:
+            Scroll -= evento.y * VelScroll
+
+            LimiteScroll = max(0, AltConteudo - 450)
+            Scroll = max(0, min(Scroll, LimiteScroll))
 
          # Click Mouse/Teclado + Musica
         if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
@@ -85,7 +98,7 @@ while Run:
                     LM = indice
                     pygame.mixer.music.load(musicas[LM])
 
-                    if TC == CorVerde:
+                    if TC == CorVerde and Pausado == False:
                         pygame.mixer.music.play()
 
                     break
@@ -109,13 +122,13 @@ while Run:
         if evento.type == pygame.KEYDOWN and evento.key == pygame.K_DOWN:
             LM = (LM + 1) % len(musicas)
             pygame.mixer.music.load(musicas[LM])
-            if TC == CorVerde:
+            if TC == CorVerde and Pausado == False:
                 pygame.mixer.music.play()
 
         if evento.type == pygame.KEYDOWN and evento.key == pygame.K_UP:
             LM = (LM - 1) % len(musicas)
             pygame.mixer.music.load(musicas[LM])
-            if TC == CorVerde:
+            if TC == CorVerde and Pausado == False:
                 pygame.mixer.music.play()
 
         if evento.type == ResetMusic and not TC == CorVermelho:
@@ -126,11 +139,11 @@ while Run:
 
     # Volume da musica
 
-        if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 4:
+        if evento.type == pygame.KEYDOWN and evento.key == pygame.K_LEFT:
             Volume = min(Volume + 0.1, 1.0)
             pygame.mixer.music.set_volume(Volume)
 
-        if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 5:
+        if evento.type == pygame.KEYDOWN and evento.key == pygame.K_RIGHT:
             Volume = max(Volume - 0.1, 0.1)
             pygame.mixer.music.set_volume(Volume)
 
@@ -138,10 +151,10 @@ while Run:
 
     #_Texto1 = Musicas
     Tnome = os.path.splitext(os.path.basename(musicas[LM]))[0]
-    #Texto = Fonte.render(Tnome, True, CorBranco)
-    #telaP.blit(Texto, (30, 10))
     RectMusic.clear()
-    Tpy = 110
+    Tpy = 110 - Scroll
+    AltConteudo = len(musicas) * 52
+    Scroll = max(0, min(Scroll, AltConteudo - 450))
 
     for i, musica in enumerate(musicas):
         T2nome = os.path.splitext(os.path.basename(musica))[0]
@@ -151,10 +164,13 @@ while Run:
             MusicCor = CorCiano
         TextoT2 = Fonte3.render(T2nome, True, MusicCor)
         PosMusic = (330, Tpy)
-        telaP.blit(TextoT2, PosMusic)
-        RectTexto = TextoT2.get_rect(topleft=PosMusic)
-        RectMusic.append((RectTexto, i))
-        Tpy += 40
+        if -50 < Tpy < 720:
+            telaP.blit(TextoT2, PosMusic)
+            RectTexto = TextoT2.get_rect(topleft=PosMusic)
+            RectMusic.append((RectTexto, i))
+        Tpy += 55
+
+        # Limite de Scroll
 
 
 
@@ -184,8 +200,32 @@ while Run:
     pygame.draw.rect(telaP, CorAzul, (0, 0, posX, posY), 10)
     pygame.draw.rect(telaP, CorAzul, (0, 100, posX, posY-200), 10)
     pygame.draw.rect(telaP, CorCiano, (10, 420, 300, 190))
-    pygame.draw.rect(telaP, TC, Objeto)
 
+    # Barra de Tempo da Musica
+    BarraTempoX = 200
+    BarraTempoY = 660
+    BarraLargura = posX - 410
+    BarraAltura = 15
+    pygame.draw.line(telaP, CorCiano, (BarraTempoX, BarraTempoY), (BarraTempoX + BarraLargura, BarraTempoY), BarraAltura)
+
+    if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
+
+        mx, my = pygame.mouse.get_pos()
+        if BarraTempoX <= mx <= BarraTempoX + BarraLargura:
+            if BarraTempoY <= my <= BarraTempoY + BarraAltura:
+                Porcentagem = (mx - BarraTempoX) / BarraLargura
+                Ntempo = T1 * Porcentagem
+
+                Progresso = pos * T1
+                Progresso = max(0, min(Progresso, 1))
+
+                pygame.mixer.music.play(start=Ntempo)
+
+                BolinhaX = BarraTempoX + (BarraLargura * Progresso)
+    pygame.draw.circle(telaP, CorBranco, (int(BarraTempoX), 660), 20)
+
+
+    pygame.draw.rect(telaP, TC, Objeto)
 
     pygame.draw.rect(telaP, TC, Objeto, 25)
 
@@ -202,7 +242,7 @@ while Run:
         telaP.blit(Texto3, (15, 535))
 
     pygame.display.flip()
-    Clock.tick(120)
+    Clock.tick(240)
 
 pygame.quit()
 sys.exit()
