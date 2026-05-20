@@ -68,24 +68,24 @@ Objeto = pygame.Rect(10, 110, 300, 300)
 # Sistema --------------------------------------------------------------------------------
 Run = True
 while Run:
-    telaP.fill(CorCinza)
+    telaP.fill(CorBranco)
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT or evento.type == pygame.KEYDOWN and evento.key == pygame.K_SPACE:
             Run = False
 
+        # Barra Tempo
         if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
             mx, my = pygame.mouse.get_pos()
 
             if BarraTempoX <= mx <= BarraTempoX + BarraLargura:
                 if BarraTempoY <= my <= BarraTempoY + BarraAltura:
-                    Porcentagem = (mx - BarraTempoX) / BarraLargura
 
+                    Porcentagem = (mx - BarraTempoX) / BarraLargura
                     Ntempo = T1 * Porcentagem
 
                     if TC == CorVerde:
-                        pygame.mixer.music.play(start=Ntempo)
-                        pos = Ntempo
                         TempoInicial = Ntempo
+                        pygame.mixer.music.play(start=Ntempo)
 
                         if Pausado:
                             pygame.mixer.music.pause()
@@ -117,12 +117,15 @@ while Run:
                     TempoInicial = 0
 
             # Clique na lista de músicas
+            mx, my = evento.pos
+
             for rect, indice in RectMusic:
 
                 if rect.collidepoint(evento.pos):
-                    LM = indice
-                    pygame.mixer.music.load(musicas[LM])
-                    Pausado = False
+                    if 120 <= my <= 600:
+                        LM = indice
+                        pygame.mixer.music.load(musicas[LM])
+                        Pausado = False
 
                     if TC == CorVerde and Pausado == False:
                         pygame.mixer.music.play()
@@ -151,6 +154,8 @@ while Run:
             pygame.mixer.music.load(musicas[LM])
             T1 = MP3(musicas[LM]).info.length
             TempoInicial = 0
+            Pausado = False
+            pygame.mixer.music.unpause()
             if TC == CorVerde and Pausado == False:
                 pygame.mixer.music.play()
 
@@ -159,6 +164,8 @@ while Run:
             pygame.mixer.music.load(musicas[LM])
             T1 = MP3(musicas[LM]).info.length
             TempoInicial = 0
+            Pausado = False
+            pygame.mixer.music.unpause()
             if TC == CorVerde and Pausado == False:
                 pygame.mixer.music.play()
 
@@ -167,6 +174,8 @@ while Run:
             pygame.mixer.music.load(musicas[LM])
             T1 = MP3(musicas[LM]).info.length
             TempoInicial = 0
+            Pausado = False
+            pygame.mixer.music.unpause()
             if TC == CorVerde:
                 pygame.mixer.music.play()
 
@@ -191,6 +200,7 @@ while Run:
 
     for i, musica in enumerate(musicas):
         T2nome = os.path.splitext(os.path.basename(musica))[0]
+        pygame.draw.rect(telaP, CorPreto, (320, Tpy, 950, 45)) #(320, 110, 950, Tpy))
         if i == LM:
             MusicCor = CorVermelho
         else:
@@ -211,12 +221,12 @@ while Run:
     NomePause = "Pausado"
     Texto3 = Fonte2.render(NomePause, True, CorVermelho)
     if TC == CorVerde:
-        pos = (pygame.mixer.music.get_pos() / 1000) + TempoInicial
-    else:
+        if not Pausado:
+            pos = (pygame.mixer.music.get_pos() / 1000) + TempoInicial
+
+    elif TC == CorVermelho:
         pos = 0
 
-    if pos < 0:
-        pos = 0
     minutos = int(pos // 60)
     segundos = int(pos % 60)
     T1minutos = int(T1 // 60)
@@ -238,6 +248,7 @@ while Run:
     pygame.draw.rect(telaP, CorAzul, (0, 0, posX, posY), 10)
     pygame.draw.rect(telaP, CorAzul, (0, 100, posX, posY-200), 10)
     pygame.draw.rect(telaP, CorCiano, (10, 420, 300, 190))
+
 
     # Barra de Tempo da Musica
 
