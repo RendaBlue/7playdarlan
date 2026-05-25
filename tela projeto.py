@@ -5,6 +5,8 @@ import os
 import random
 import re
 
+from pygame.constants import K_KP_ENTER
+
 pygame.init()
 
 # ======================================================================================
@@ -24,7 +26,7 @@ CorVerdeDark = (0, 100, 0)
 # ==================================================================
 # Fontes |----------------------------------------------------------
 # ==================================================================
-Fonte = pygame.font.SysFont("Comic Sans", 50, True)
+Fonte = pygame.font.SysFont("Comic Sans", 40, True)
 Fonte2 = pygame.font.SysFont("none", 100, False)
 Fonte3 = pygame.font.SysFont("Calibri", 35, True)
 
@@ -71,10 +73,17 @@ Tempo = 0
 UPos = 0
 Scroll = 0
 VelScroll = 30
-BarraTempoX = 200
-BarraTempoY = posY-60
-BarraLargura = posX-410
+
+Interface = 0
+PosicaoCelular = True
+
+# Tempo de Barra
+BarraTempoX = 165 # incio
+BarraTempoY = posY-45
+
+BarraLargura = posX-165-BarraTempoX # tamanho
 BarraAltura = 20
+
 TempoInicial = 0
 
 # ==========================================================================================
@@ -83,7 +92,7 @@ TempoInicial = 0
 TC = CorVermelho
 Pausado = False
 Infor = pygame.display.get_desktop_sizes()
-Objeto = pygame.Rect(10, 110, 300, 300)
+PlayStop = pygame.Rect(10, 85, 86, 86)
 
 # ========================================================================================
 # Sistema |-------------------------------------------------------------------------------
@@ -101,8 +110,8 @@ while Run:
             posX = evento.w
             posY = evento.h
 
-            BarraTempoY = posY - 60
-            BarraLargura = posX - 410
+            BarraTempoY = posY - 45
+            BarraLargura = posX-165-BarraTempoX
 
 
 # ==========================================================================================================
@@ -115,7 +124,7 @@ while Run:
             mx, my = pygame.mouse.get_pos()
 
             if BarraTempoX <= mx <= BarraTempoX + BarraLargura:
-                if BarraTempoY <= my <= BarraTempoY + BarraAltura:
+                if BarraTempoY-15 <= my <= BarraTempoY + BarraAltura:
 
                     Porcentagem = (mx - BarraTempoX) / BarraLargura
                     Ntempo = T1 * Porcentagem
@@ -128,11 +137,9 @@ while Run:
                         if Pausado:
                             pygame.mixer.music.pause()
 
-    # Botão de Play e Stop ================================================
-
         if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
+            if PlayStop.collidepoint(evento.pos):
 
-            if Objeto.collidepoint(evento.pos):
                 if TC == CorVermelho:
                     TC = CorVerde
                     pygame.mixer.music.play()
@@ -143,12 +150,12 @@ while Run:
                     TempoInicial = 0
 
         # Click na Musica para Selecionar =====================================
-
             mx, my = evento.pos
 
             for rect, indice in RectMusic:
 
                 if rect.collidepoint(evento.pos):
+
                     LM = indice
                     pygame.mixer.music.load(musicas[LM])
                     T1 = MP3(musicas[LM]).info.length
@@ -165,10 +172,27 @@ while Run:
         if evento.type == pygame.MOUSEWHEEL:
             Scroll -= evento.y * VelScroll
 
-            LimiteScroll = max(0, AltConteudo - posY+280)
+            LimiteScroll = max(0, AltConteudo - posY+252)
             Scroll = max(0, min(Scroll, LimiteScroll))
 
-    # Atulizar a Lista de Musica ==============================================
+# =================================================================================
+# Teclado + Musica |---------------------------------------------------------------
+# =================================================================================
+
+            # Botão de Play e Stop ================================================
+
+        if evento.type == pygame.KEYDOWN and evento.key == pygame.K_RETURN:
+
+            if TC == CorVermelho:
+                TC = CorVerde
+                pygame.mixer.music.play()
+                Pausado = False
+            else:
+                TC = CorVermelho
+                pygame.mixer.music.stop()
+                TempoInicial = 0
+
+        # Atulizar a Lista de Musica ==============================================
 
         if evento.type == pygame.KEYDOWN and evento.key == pygame.K_r:
             musicas = [
@@ -176,10 +200,6 @@ while Run:
         for musica in os.listdir(Pmusicas)
         if musica.endswith(".mp3")
         ]
-
-# =================================================================================
-# Teclado + Musica |---------------------------------------------------------------
-# =================================================================================
 
     # Pausar e Despausar a musica ===============================================
 
@@ -251,13 +271,13 @@ while Run:
     Tnome = os.path.splitext(os.path.basename(musicas[LM]))[0]
     Tnome = re.sub(r'^[0-9.\- ]+', '', Tnome)
     RectMusic.clear()
-    Tpy = 115 - Scroll
-    AltConteudo = len(musicas) * 47
-    Scroll = max(0, min(Scroll, AltConteudo - posY+280))
+    Tpy = 90 - Scroll
+    AltConteudo = len(musicas) * 46
+    Scroll = max(0, min(Scroll, AltConteudo - posY+252))
     for i, musica in enumerate(musicas):
         T2nome = os.path.splitext(os.path.basename(musica))[0]
         T2nome = re.sub(r'^[0-9.\- ]+', '', T2nome)
-        Objeto2 = pygame.Rect(325, Tpy, posX-340, 45)
+        Objeto2 = pygame.Rect(110, Tpy, posX-125, 45)
         ObjetoCor = CorCinza
         if i == LM:
             MusicCor = CorAmarelo
@@ -265,10 +285,10 @@ while Run:
         else:
             MusicCor = CorLaranja
             ObjetoCor = CorPreto
-        TextoT2 = Fonte3.render(T2nome, True, MusicCor)
         ObjetoD2 = pygame.draw.rect(telaP, ObjetoCor, Objeto2)
-        PosMusic = (335, Tpy+5)
-        if 90 < Tpy < posY-128:
+        TextoT2 = Fonte3.render(T2nome, True, MusicCor)
+        PosMusic = (120, Tpy+5)
+        if 55 < Tpy < posY-100:
             telaP.blit(TextoT2, PosMusic)
             RectTexto = TextoT2.get_rect(topleft=PosMusic)
             RectMusic.append((RectTexto, i))
@@ -297,13 +317,13 @@ while Run:
 
 # Atulização ------------------------------------------------------------------------------------
 
-    pygame.draw.line(telaP, CorPreto, (10, 50), (posX, 50), 100) # Linha Preta Cima
-    pygame.draw.line(telaP, CorPreto, (10, posY-51), (posX, posY-51), 100) # Linha Preta Baixo
-    pygame.draw.line(telaP, CorAzul, (314, 110), (314, posY-110), 10)  # Linha Azul Meio
-    pygame.draw.line(telaP, CorAzul, (10, 415), (310,  415), 10) # Linha Azul Meio Esquerda
+    pygame.draw.line(telaP, CorPreto, (10, 42), (posX-10, 42), 65) # Linha Preta Cima
+    pygame.draw.line(telaP, CorPreto, (10, posY-43), (posX-10, posY-43), 65) # Linha Preta Baixo
+    pygame.draw.line(telaP, CorAzul, (100, 85), (100, posY-80), 10)  # Linha Azul Meio
+    #pygame.draw.line(telaP, CorAzul, (10, 415), (310,  415), 10) # Linha Azul Meio Esquerda
     pygame.draw.rect(telaP, CorAzul, (0, 0, posX, posY), 10) # Borda azul da Janela
-    pygame.draw.rect(telaP, CorAzul, (0, 100, posX, posY-200), 10) # Borda Mais Dentro da Janela
-    pygame.draw.rect(telaP, CorCiano, (10, 420, 300, posY-530)) # Retangulo sem Função Ainda
+    pygame.draw.rect(telaP, CorAzul, (0, 75, posX, posY-150), 10) # Borda Mais Dentro da Janela
+    pygame.draw.rect(telaP, CorCinza, (10, 85, 86, posY-170)) # Retangulo sem Função Ainda
 
 
     # Barra de Tempo da Musica
@@ -323,17 +343,21 @@ while Run:
     pygame.draw.line(telaP, CorAmarelo, (BarraTempoX, BarraTempoY), (BolinhaX, BarraTempoY), BarraAltura)
 
     # Bolinha do Tempo
-    pygame.draw.circle(telaP, CorLaranja, (int(BolinhaX), posY-60), 20)
+    pygame.draw.circle(telaP, CorLaranja, (int(BolinhaX), posY-45), 20)
 
-    pygame.draw.rect(telaP, TC, Objeto) # Botão de Play e Stop
+    pygame.draw.polygon(telaP,TC,[(85 ,129),(20, 93),(20, 162)])
+    pygame.draw.polygon(telaP,TC,[(85 ,129),(20, 93),(20, 162)])# Pause e Despause
+    # Loop
+    # Encerar
 
     # Nome da música atual =======================================
-    Texto = Fonte.render(Tnome, True, CorBranco)
-    telaP.blit(Texto, (30, 10))
+    TextoMusic = Fonte.render(Tnome, True, CorBranco)
+    TextoMusicCenter = TextoMusic.get_rect(center=(posX/2, 35))
+    telaP.blit(TextoMusic, TextoMusicCenter)
 
     # Tempo =======================================================
-    telaP.blit(TextoT1, (20, posY-95))
-    telaP.blit(TextoT2, (posX-170, posY-95))
+    telaP.blit(TextoT1, (20, posY-75)) # Atual
+    telaP.blit(TextoT2, (posX-130, posY-75)) # Total
 
     # Pausado ==================================================
     if Pausado and TC == CorVerde:
