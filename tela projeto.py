@@ -177,7 +177,7 @@ while Run:
 # Teclado + Musica |---------------------------------------------------------------
 # =================================================================================
 
-            # Botão de Play e Stop ================================================
+        # Botão de Play e Stop ================================================
 
         if evento.type == pygame.KEYDOWN and evento.key == pygame.K_RETURN:
 
@@ -252,6 +252,8 @@ while Run:
             if TC == CorVerde:
                 pygame.mixer.music.play()
 
+
+
     # Volume da Musica / Diminuir e Aumentar ===================================================
 
         if evento.type == pygame.KEYDOWN and evento.key == pygame.K_RIGHT:
@@ -292,6 +294,17 @@ while Run:
             RectMusic.append((Objeto2, i))
         Tpy += 50
 
+        # sem nome
+
+        Teclas = pygame.key.get_pressed()
+
+        if Teclas[pygame.K_UP] or Teclas[pygame.K_DOWN]:
+            if Objeto2[1] <= 50 and ObjetoCor == CorVerdeDark:
+                Scroll -= 50
+
+        if Teclas[pygame.K_DOWN] or Teclas[pygame.K_UP]:
+            if Objeto2[1] >= posY-110 and ObjetoCor == CorVerdeDark:
+                Scroll += 50
 
     # Sistema de Tempo da Musica
     if TC == CorVerde:
@@ -324,7 +337,7 @@ while Run:
 
 
     # Barra de Tempo da Musica
-    pygame.draw.line(telaP, CorAzulEstranho, (BarraTempoX, BarraTempoY), (BarraTempoX + BarraLargura, BarraTempoY), BarraAltura)
+    pygame.draw.line(telaP, CorLaranja, (BarraTempoX, BarraTempoY), (BarraTempoX + BarraLargura, BarraTempoY), BarraAltura)
 
     # Sistema da Bolinha do Tempo
     if T1 > 0:
@@ -340,7 +353,7 @@ while Run:
     pygame.draw.line(telaP, CorAmarelo, (BarraTempoX, BarraTempoY), (BolinhaX, BarraTempoY), BarraAltura)
 
     # Bolinha do Tempo
-    pygame.draw.circle(telaP, CorLaranja, (int(BolinhaX), posY-45), 20)
+    pygame.draw.circle(telaP, CorAmarelo, (int(BolinhaX), posY-45), 20)
 
     pygame.draw.rect(telaP,CorVermelho,(10+10, posY-165, 86-20, 86-20),border_radius=10) # Encerrar a Musica
 
