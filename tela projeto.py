@@ -93,6 +93,7 @@ TC = CorVermelho
 Pausado = False
 Infor = pygame.display.get_desktop_sizes()
 PlayStop = pygame.Rect(10, 85, 86, 86)
+ClickList = pygame.Rect(106, 85, posX-116, posY-170)
 
 # ========================================================================================
 # Sistema |-------------------------------------------------------------------------------
@@ -100,7 +101,7 @@ PlayStop = pygame.Rect(10, 85, 86, 86)
 
 Run = True
 while Run:
-    telaP.fill(CorAzulEstranho)
+    telaP.fill(CorBranco)
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT or evento.type == pygame.KEYDOWN and evento.key == pygame.K_SPACE:
             Run = False
@@ -119,7 +120,6 @@ while Run:
 # ==========================================================================================================
 
     # Barra de Tempo ==================================================================
-
         if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
             mx, my = pygame.mouse.get_pos()
 
@@ -140,22 +140,20 @@ while Run:
         if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
             if PlayStop.collidepoint(evento.pos):
 
-                if TC == CorVermelho:
-                    TC = CorVerde
-                    pygame.mixer.music.play()
-                    Pausado = False
-                else:
-                    TC = CorVermelho
-                    pygame.mixer.music.stop()
-                    TempoInicial = 0
+                if TC == CorVerde:
+                    if not Pausado:
+                        Pausado = True
+                        pygame.mixer.music.pause()
+                    else:
+                        Pausado = False
+                        pygame.mixer.music.unpause()
 
         # Click na Musica para Selecionar =====================================
             mx, my = evento.pos
 
             for rect, indice in RectMusic:
 
-                if rect.collidepoint(evento.pos):
-
+                if rect.collidepoint(mx, my) and ClickList.collidepoint(mx, my):
                     LM = indice
                     pygame.mixer.music.load(musicas[LM])
                     T1 = MP3(musicas[LM]).info.length
@@ -268,6 +266,7 @@ while Run:
 # Lista de Musicas |--------------------------------------------------------------------
 # ======================================================================================
 
+    pygame.draw.rect(telaP, CorAzulEstranho, ClickList) # fundo da lista
     Tnome = os.path.splitext(os.path.basename(musicas[LM]))[0]
     Tnome = re.sub(r'^[0-9.\- ]+', '', Tnome)
     RectMusic.clear()
@@ -290,14 +289,11 @@ while Run:
         PosMusic = (120, Tpy+5)
         if 55 < Tpy < posY-100:
             telaP.blit(TextoT2, PosMusic)
-            RectTexto = TextoT2.get_rect(topleft=PosMusic)
-            RectMusic.append((RectTexto, i))
+            RectMusic.append((Objeto2, i))
         Tpy += 50
 
 
     # Sistema de Tempo da Musica
-    NomePause = "Pausado"
-    Texto3 = Fonte2.render(NomePause, True, CorVermelho)
     if TC == CorVerde:
         if not Pausado:
             pos = (pygame.mixer.music.get_pos() / 1000) + TempoInicial
@@ -323,7 +319,8 @@ while Run:
     #pygame.draw.line(telaP, CorAzul, (10, 415), (310,  415), 10) # Linha Azul Meio Esquerda
     pygame.draw.rect(telaP, CorAzul, (0, 0, posX, posY), 10) # Borda azul da Janela
     pygame.draw.rect(telaP, CorAzul, (0, 75, posX, posY-150), 10) # Borda Mais Dentro da Janela
-    pygame.draw.rect(telaP, CorCinza, (10, 85, 86, posY-170)) # Retangulo sem Função Ainda
+    pygame.draw.rect(telaP, CorCinza, (10, 85, 86, posY-170)) # Linha Cinza das Funções
+
 
 
     # Barra de Tempo da Musica
@@ -345,8 +342,13 @@ while Run:
     # Bolinha do Tempo
     pygame.draw.circle(telaP, CorLaranja, (int(BolinhaX), posY-45), 20)
 
-    pygame.draw.polygon(telaP,TC,[(85 ,129),(20, 93),(20, 162)])
-    pygame.draw.polygon(telaP,TC,[(85 ,129),(20, 93),(20, 162)])# Pause e Despause
+    pygame.draw.rect(telaP,CorVermelho,(10+10, posY-165, 86-20, 86-20),border_radius=10) # Encerrar a Musica
+
+    if Pausado == True:
+        pygame.draw.polygon(telaP,CorBranco,[(85 ,129),(20, 93),(20, 162)])# Pause e Despause
+    elif Pausado == False:
+        pygame.draw.line(telaP, CorBranco,(35, 93),(35, 160),20,)
+        pygame.draw.line(telaP, CorBranco, (68, 93), (68, 160), 20)
     # Loop
     # Encerar
 
@@ -360,8 +362,8 @@ while Run:
     telaP.blit(TextoT2, (posX-130, posY-75)) # Total
 
     # Pausado ==================================================
-    if Pausado and TC == CorVerde:
-        telaP.blit(Texto3, (15, 535))
+    #if Pausado and TC == CorVerde:
+        #telaP.blit(Texto3, (15, 535))
 
     pygame.display.flip()
     Clock.tick(60)
