@@ -279,7 +279,7 @@ while Run:
         T2nome = os.path.splitext(os.path.basename(musica))[0]
         T2nome = re.sub(r'^[0-9.\- ]+', '', T2nome)
         Objeto2 = pygame.Rect(110, Tpy, posX-125, 45)
-        ObjetoCor = CorCinza
+        ObjetoCor = CorPreto
         if i == LM:
             MusicCor = CorAmarelo
             ObjetoCor = CorVerdeDark
@@ -298,11 +298,11 @@ while Run:
 
         Teclas = pygame.key.get_pressed()
 
-        if Teclas[pygame.K_UP] or Teclas[pygame.K_DOWN]:
+        if Teclas[pygame.K_UP]:
             if Objeto2[1] <= 50 and ObjetoCor == CorVerdeDark:
                 Scroll -= 50
 
-        if Teclas[pygame.K_DOWN] or Teclas[pygame.K_UP]:
+        if Teclas[pygame.K_DOWN]:
             if Objeto2[1] >= posY-110 and ObjetoCor == CorVerdeDark:
                 Scroll += 50
 
@@ -319,6 +319,8 @@ while Run:
     segundos = int(pos % 60)
     TextoT1 = Fonte.render(f"{minutos:02}:{segundos:02}", True, CorBranco)
 
+
+
     # Tempo Total da Musica
     T1minutos = int(T1 // 60)
     T1segundos = int(T1 % 60)
@@ -334,7 +336,9 @@ while Run:
     pygame.draw.rect(telaP, CorAzul, (0, 75, posX, posY-150), 10) # Borda Mais Dentro da Janela
     pygame.draw.rect(telaP, CorCinza, (10, 85, 86, posY-170)) # Linha Cinza das Funções
 
-
+    pygame.draw.circle(telaP, CorAmarelo, (54, 220), 30)
+    pygame.draw.circle(telaP, CorCinza, (54, 220), 20)
+    pygame.draw.polygon(telaP, CorAmarelo, [(70, 245), (45, 232), (45, 255)])  # Pause e Despause
 
     # Barra de Tempo da Musica
     pygame.draw.line(telaP, CorLaranja, (BarraTempoX, BarraTempoY), (BarraTempoX + BarraLargura, BarraTempoY), BarraAltura)
