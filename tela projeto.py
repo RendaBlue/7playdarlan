@@ -113,6 +113,8 @@ while Run:
 
             BarraTempoY = posY - 45
             BarraLargura = posX-165-BarraTempoX
+            ClickList = pygame.Rect(106, 85, posX - 116, posY - 170)
+
 
 
 # ==========================================================================================================
@@ -336,9 +338,11 @@ while Run:
     pygame.draw.rect(telaP, CorAzul, (0, 75, posX, posY-150), 10) # Borda Mais Dentro da Janela
     pygame.draw.rect(telaP, CorCinza, (10, 85, 86, posY-170)) # Linha Cinza das Funções
 
+    # Botao de Reset
     pygame.draw.circle(telaP, CorAmarelo, (54, 220), 30)
     pygame.draw.circle(telaP, CorCinza, (54, 220), 20)
-    pygame.draw.polygon(telaP, CorAmarelo, [(70, 245), (45, 232), (45, 255)])  # Pause e Despause
+    pygame.draw.line(telaP, CorCinza, (50, 230), (80, 250), 10)
+    pygame.draw.polygon(telaP, CorAmarelo, [(70, 245), (45, 230), (45, 255)])  # Pause e Despause
 
     # Barra de Tempo da Musica
     pygame.draw.line(telaP, CorLaranja, (BarraTempoX, BarraTempoY), (BarraTempoX + BarraLargura, BarraTempoY), BarraAltura)
