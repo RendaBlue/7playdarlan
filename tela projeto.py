@@ -72,8 +72,6 @@ Clock = pygame.time.Clock()
 # Variaveis |------------------------------------------------------------------------
 # ===================================================================================
 
-Tempo = 0
-UPos = 0
 Scroll = 0
 VelScroll = 30
 
@@ -158,12 +156,12 @@ while Run:
             if BarraTempoX <= mx <= BarraTempoX + BarraLargura:
                 Porcentagem = (mx - BarraTempoX) / BarraLargura
                 Ntempo = T1 * Porcentagem
-                TempoInicial = Ntempo
                 Bolinha.x = mx - 20
 
         if evento.type == pygame.MOUSEBUTTONUP and evento.button == 1:
             if Arrastar and TC == CorVerde:
 
+                TempoInicial = Ntempo
                 pygame.mixer.music.play(start=Ntempo)
                 Arrastar = False
 
@@ -279,14 +277,17 @@ while Run:
     # Trocar a Musica Automaticamnete =========================================
 
         if evento.type == ResetMusic and not TC == CorVermelho:
-            LM = (LM + 1) % len(musicas)
-            pygame.mixer.music.load(musicas[LM])
-            T1 = MP3(musicas[LM]).info.length
-            TempoInicial = 0
-            Pausado = False
-            pygame.mixer.music.unpause()
-            if TC == CorVerde:
-                pygame.mixer.music.play()
+            if Arrastar == True:
+                pygame.mixer.music.unpause()
+                Arrastar = False
+                LM = (LM + 1) % len(musicas)
+                pygame.mixer.music.load(musicas[LM])
+                T1 = MP3(musicas[LM]).info.length
+                TempoInicial = 0
+                Pausado = False
+                pygame.mixer.music.unpause()
+                if TC == CorVerde:
+                    pygame.mixer.music.play()
 
     # Volume da Musica / Diminuir e Aumentar ===================================================
 
@@ -340,9 +341,17 @@ while Run:
     minutos = int(pos // 60)
     segundos = int(pos % 60)
     mx, my = pygame.mouse.get_pos()
-    TMusic = int(T1 * (mx - BarraTempoX) / BarraLargura)
+
+    TM_limite = (mx - BarraTempoX) / BarraLargura
+    TM_limite = max(0, min(TM_limite, 1))
+
+    TMusic = int(T1 * TM_limite)
+
     TextoT1 = Fonte.render(f"{minutos:02}:{segundos:02}", True, CorBranco)
-    if BarraTempoX <= mx <= BarraTempoX + BarraLargura:
+
+    if Arrastar:
+        TextoT1 = Fonte.render(f"{TMusic // 60:02}:{TMusic % 60:02}", True, CorCiano)
+    elif BarraTempoX <= mx <= BarraTempoX + BarraLargura:
         if BarraTempoY - 15 <= my <= BarraTempoY + BarraAltura:
             if TC == CorVerde and not Bolinha.collidepoint(mx, my) and not Arrastar:
                 TextoT1 = Fonte.render(f"{TMusic// 60:02}:{TMusic % 60:02}", True, BolinhaCor)
@@ -391,6 +400,8 @@ while Run:
     BolinhaXT = BarraTempoX + (BarraLargura * Progresso)
     BolinhaX = max(BarraTempoX,min(BolinhaXT, BarraTempoX + BarraLargura))
 
+
+
     if not Arrastar:
         Bolinha.centerx = int(BolinhaX)
 
@@ -411,15 +422,18 @@ while Run:
     if TC == CorVerde and not Bolinha.collidepoint(mx, my) and not Arrastar:
         if BarraTempoX <= mx <= BarraTempoX + BarraLargura:
             if BarraTempoY-15 <= my <= BarraTempoY + BarraAltura:
-                pygame.draw.line(telaP, BolinhaCor, (BolinhaX, BarraTempoY), (mx, BarraTempoY), BarraAltura)
+
+                pygame.draw.line(telaP, BolinhaCor, (BolinhaX, BarraTempoY),
+                                 (mx, BarraTempoY), BarraAltura)
                 BolinhaRect = pygame.draw.circle(telaP, BolinhaCor, (mx, posY-45), 15)
 
-    # Calcular a
+    # Previa da musica
+    PAM = BarraTempoX + (BarraLargura * (pos / T1))
 
-    #if Arrastar:
-        #pygame.draw.line(telaP, CorAzul,
-                         #(mx, BarraTempoY),
-                         #(pos, BarraTempoY), 50)
+    if Arrastar:
+        pygame.draw.line(telaP, CorAzul,
+                         (int(PAM), BarraTempoY),
+                         (Bolinha.x + 20, BarraTempoY), 50)
         #pygame.draw.circle(telaP, BolinhaCor, (Bolinha.x + 20, posY-45), 15)
 
     # Aparencia da Bolinha
