@@ -277,17 +277,16 @@ while Run:
     # Trocar a Musica Automaticamnete =========================================
 
         if evento.type == ResetMusic and not TC == CorVermelho:
-            if Arrastar == True:
-                pygame.mixer.music.unpause()
-                Arrastar = False
-                LM = (LM + 1) % len(musicas)
-                pygame.mixer.music.load(musicas[LM])
-                T1 = MP3(musicas[LM]).info.length
-                TempoInicial = 0
-                Pausado = False
-                pygame.mixer.music.unpause()
-                if TC == CorVerde:
-                    pygame.mixer.music.play()
+            pygame.mixer.music.unpause()
+            Arrastar = False
+            LM = (LM + 1) % len(musicas)
+            pygame.mixer.music.load(musicas[LM])
+            T1 = MP3(musicas[LM]).info.length
+            TempoInicial = 0
+            Pausado = False
+            pygame.mixer.music.unpause()
+            if TC == CorVerde:
+                pygame.mixer.music.play()
 
     # Volume da Musica / Diminuir e Aumentar ===================================================
 
@@ -376,16 +375,15 @@ while Run:
 
     #pygame.draw.rect(telaP, CorVerdeDark, PlayStop)
     #pygame.draw.rect(telaP, CorAzul, Bolinha)
+    #pygame.draw.rect(telaP, CorCiano, BAleatorio) # Botão Aleatorio
+    #pygame.draw.rect(telaP, CorVermelho, (PF[0], 265+45, PF[2], PF[3]))
+    #pygame.draw.rect(telaP, CorBranco, (PF[0], 355+70, PF[2], PF[3]))
 
-    pygame.draw.rect(telaP, CorCiano, BAleatorio)
-    pygame.draw.rect(telaP, CorVermelho, (PF[0], 265+45, PF[2], PF[3]))
-    pygame.draw.rect(telaP, CorBranco, (PF[0], 355+70, PF[2], PF[3]))
-
-    # Botao de Loop
-    pygame.draw.circle(telaP, CorAmarelo, (54, 245), 30)
-    pygame.draw.circle(telaP, CorCinza, (54, 245), 20)
-    pygame.draw.line(telaP, CorCinza, (50, 250), (80, 275), 10)
-    pygame.draw.polygon(telaP, CorAmarelo, [(70, 272), (50, 255), (45, 285)])
+    # Botao de Looop
+    #pygame.draw.circle(telaP, CorAmarelo, (54, 245), 30)
+    #pygame.draw.circle(telaP, CorCinza, (54, 245), 20)
+    #pygame.draw.line(telaP, CorCinza, (50, 250), (80, 275), 10)
+    #pygame.draw.polygon(telaP, CorAmarelo, [(70, 272), (50, 255), (45, 285)])
 
     # Barra de Tempo da Musica
     pygame.draw.line(telaP, CorCinza, (BarraTempoX, BarraTempoY), (BarraTempoX + BarraLargura, BarraTempoY), BarraAltura)
@@ -400,16 +398,11 @@ while Run:
     BolinhaXT = BarraTempoX + (BarraLargura * Progresso)
     BolinhaX = max(BarraTempoX,min(BolinhaXT, BarraTempoX + BarraLargura))
 
-
-
     if not Arrastar:
         Bolinha.centerx = int(BolinhaX)
 
     if not Arrastar:
         pygame.draw.line(telaP, CorBranco, (BarraTempoX, BarraTempoY), (BolinhaX, BarraTempoY), BarraAltura)
-    else:
-        pygame.draw.line(telaP, CorBranco, (BarraTempoX, BarraTempoY), (Bolinha.x + 20, BarraTempoY), BarraAltura)
-
 
     BolinhaCor = CorVerde
     if BolinhaX > mx:
@@ -429,17 +422,24 @@ while Run:
 
     # Previa da musica
     PAM = BarraTempoX + (BarraLargura * (pos / T1))
+    PAM1 =  (int(PAM), BarraTempoY)
+    PAM2 =  (Bolinha.x + 20, BarraTempoY)
 
     if Arrastar:
-        pygame.draw.line(telaP, CorAzul,
-                         (int(PAM), BarraTempoY),
-                         (Bolinha.x + 20, BarraTempoY), 50)
-        #pygame.draw.circle(telaP, BolinhaCor, (Bolinha.x + 20, posY-45), 15)
+        if BolinhaX < mx:
+            BolinhaCor = CorVermelho
+        elif BolinhaX > mx:
+            BolinhaCor = CorVerde
+
+    if Arrastar:
+        pygame.draw.line(telaP, CorCiano, PAM1, PAM2, 10)
+
+        pygame.draw.rect(telaP, BolinhaCor, (int(PAM),posY-64, 10, 40), border_radius=15)
 
     # Aparencia da Bolinha
     if TC == CorVerde and Bolinha.collidepoint(mx, my) or Arrastar:
-        pygame.draw.circle(telaP, CorAmarelo, (Bolinha.x + 20, posY - 45), 20)
-        pygame.draw.circle(telaP, CorLaranja, (Bolinha.x + 20, posY - 45), 15)
+        pygame.draw.circle(telaP, CorCiano, (Bolinha.x + 20, posY - 45), 20)
+        pygame.draw.circle(telaP, CorAzul, (Bolinha.x + 20, posY - 45), 15)
 
     elif not Arrastar:
         pygame.draw.circle(telaP, CorBranco, (BolinhaX, posY - 45), 20)
