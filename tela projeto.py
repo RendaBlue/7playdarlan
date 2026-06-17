@@ -139,12 +139,12 @@ while Run:
 
         if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
             if Bolinha.collidepoint(pygame.mouse.get_pos()):
-                if TC == CorVerde and not Arrastar:
+                if TC == CorVerde and not Arrastar and not Pausado:
 
                     Arrastar = True
 
             elif BarraTTotal.collidepoint(pygame.mouse.get_pos()):
-                if TC == CorVerde:
+                if TC == CorVerde and not Pausado:
 
                     Porcentagem = (mx - BarraTempoX) / BarraLargura
                     Ntempo = T1 * Porcentagem
@@ -352,10 +352,11 @@ while Run:
         TextoT1 = Fonte.render(f"{TMusic // 60:02}:{TMusic % 60:02}", True, CorCiano)
     elif BarraTempoX <= mx <= BarraTempoX + BarraLargura:
         if BarraTempoY - 15 <= my <= BarraTempoY + BarraAltura:
-            if TC == CorVerde and not Bolinha.collidepoint(mx, my) and not Arrastar:
-                TextoT1 = Fonte.render(f"{TMusic// 60:02}:{TMusic % 60:02}", True, BolinhaCor)
-            else:
-                TextoT1 = Fonte.render(f"{minutos:02}:{segundos:02}", True, CorBranco)
+            if TC == CorVerde and not Arrastar and not Pausado:
+                if not Bolinha.collidepoint(mx, my):
+                    TextoT1 = Fonte.render(f"{TMusic// 60:02}:{TMusic % 60:02}", True, BolinhaCor)
+                else:
+                    TextoT1 = Fonte.render(f"{minutos:02}:{segundos:02}", True, CorBranco)
 
 
     # Tempo Total da Musica
@@ -412,7 +413,7 @@ while Run:
 
     # Bolinha e Barra Vermelha e Verde
     mx, my = pygame.mouse.get_pos()
-    if TC == CorVerde and not Bolinha.collidepoint(mx, my) and not Arrastar:
+    if TC == CorVerde and not Bolinha.collidepoint(mx, my) and not Arrastar and not Pausado:
         if BarraTempoX <= mx <= BarraTempoX + BarraLargura:
             if BarraTempoY-15 <= my <= BarraTempoY + BarraAltura:
 
@@ -432,12 +433,11 @@ while Run:
             BolinhaCor = CorVerde
 
     if Arrastar:
-        pygame.draw.line(telaP, CorCiano, PAM1, PAM2, 10)
 
         pygame.draw.rect(telaP, BolinhaCor, (int(PAM),posY-64, 10, 40), border_radius=15)
 
     # Aparencia da Bolinha
-    if TC == CorVerde and Bolinha.collidepoint(mx, my) or Arrastar:
+    if TC == CorVerde and not Pausado and Bolinha.collidepoint(mx, my) or Arrastar:
         pygame.draw.circle(telaP, CorCiano, (Bolinha.x + 20, posY - 45), 20)
         pygame.draw.circle(telaP, CorAzul, (Bolinha.x + 20, posY - 45), 15)
 
