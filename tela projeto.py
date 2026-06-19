@@ -102,8 +102,6 @@ BAleatorio = pygame.Rect(10, 200, 86, 91)
 #pygame.draw.rect(telaP, CorVermelho, (PF[0], 265+45, PF[2], PF[3]))
 #pygame.draw.rect(telaP, CorBranco, (PF[0], 355+70, PF[2], PF[3]))
 ClickList = pygame.Rect(106, 85, posX-116, posY-170)
-#Bolinha = BarraTempoX, BarraTempoY-20, 40, BarraAltura+20
-
 Bolinha = pygame.Rect(BarraTempoX-20, BarraTempoY-20, 40, BarraAltura+20)
 BarraTTotal = pygame.Rect(BarraTempoX, BarraTempoY-15, BarraLargura, BarraAltura+15)
 
@@ -129,6 +127,8 @@ while Run:
 
             BarraTempoY = posY - 45
             BarraLargura = posX-165-BarraTempoX
+            BarraTTotal = pygame.Rect(BarraTempoX, BarraTempoY - 15, BarraLargura, BarraAltura + 15)
+            Bolinha = pygame.Rect(BarraTempoX - 20, BarraTempoY - 20, 40, BarraAltura + 20)
             ClickList = pygame.Rect(106, 85, posX - 116, posY - 170)
 
 # ==========================================================================================================
@@ -149,8 +149,19 @@ while Run:
                     Porcentagem = (mx - BarraTempoX) / BarraLargura
                     Ntempo = T1 * Porcentagem
                     TempoInicial = Ntempo
-                    Bolinha.x = mx-20
+                    #Bolinha.x = mx-20
                     pygame.mixer.music.play(start=Ntempo)
+
+                elif TC == CorVerde and Pausado:
+
+                    Porcentagem = (mx - BarraTempoX) / BarraLargura
+                    Ntempo = T1 * Porcentagem
+                    TempoInicial = Ntempo
+                    pygame.mixer.music.play(start=Ntempo)
+                    if Pausado:
+                        pygame.mixer.music.pause()
+
+                    #Bolinha.x = mx - 20
 
         if Arrastar:
             if BarraTempoX <= mx <= BarraTempoX + BarraLargura:
@@ -179,9 +190,13 @@ while Run:
                     if not Pausado:
                         Pausado = True
                         pygame.mixer.music.pause()
-                    else:
+                    elif Pausado:
                         Pausado = False
                         pygame.mixer.music.unpause()
+                elif TC == CorVermelho:
+                    pygame.mixer.music.play()
+                    TC = CorVerde
+
 
     # Botao Play/Stop com o click ========================================
 
@@ -224,7 +239,7 @@ while Run:
         if evento.type == pygame.MOUSEWHEEL:
             Scroll -= evento.y * VelScroll
 
-            LimiteScroll = max(0, AltConteudo - posY + 260)
+            LimiteScroll = max(0, AltConteudo - posY + 270)
             Scroll = max(0, min(Scroll, LimiteScroll))
 
         # Atulizar a Lista de Musica ==============================================
@@ -308,7 +323,7 @@ while Run:
     RectMusic.clear()
     Tpy = 90 - Scroll
     AltConteudo = len(musicas) * 46
-    Scroll = max(0, min(Scroll, AltConteudo - posY+260))
+    Scroll = max(0, min(Scroll, AltConteudo - posY+270))
     for i, musica in enumerate(musicas):
         T2nome = os.path.splitext(os.path.basename(musica))[0]
         T2nome = re.sub(r'^[0-9.\- ]+', '', T2nome)
@@ -321,7 +336,7 @@ while Run:
             MusicCor = CorLaranja
             ObjetoCor = CorPreto
         ObjetoD2 = pygame.draw.rect(telaP, ObjetoCor, Objeto2)
-        TextoT2 = Fonte3.render(T2nome, True, MusicCor)
+        TextoT2 = Fonte3.render(f"{i+1:03}. " + T2nome, True, MusicCor)
         PosMusic = (120, Tpy+5)
         if 55 < Tpy < posY-100:
             telaP.blit(TextoT2, PosMusic)
@@ -330,8 +345,7 @@ while Run:
 
     # Sistema de Tempo da Musica
     if TC == CorVerde:
-        if not Pausado:
-            pos = (pygame.mixer.music.get_pos() / 1000) + TempoInicial
+        pos = (pygame.mixer.music.get_pos() / 1000) + TempoInicial
 
     elif TC == CorVermelho:
         pos = 0
@@ -352,7 +366,7 @@ while Run:
         TextoT1 = Fonte.render(f"{TMusic // 60:02}:{TMusic % 60:02}", True, CorCiano)
     elif BarraTempoX <= mx <= BarraTempoX + BarraLargura:
         if BarraTempoY - 15 <= my <= BarraTempoY + BarraAltura:
-            if TC == CorVerde and not Arrastar and not Pausado:
+            if TC == CorVerde and not Arrastar:
                 if not Bolinha.collidepoint(mx, my):
                     TextoT1 = Fonte.render(f"{TMusic// 60:02}:{TMusic % 60:02}", True, BolinhaCor)
                 else:
@@ -401,8 +415,6 @@ while Run:
 
     if not Arrastar:
         Bolinha.centerx = int(BolinhaX)
-
-    if not Arrastar:
         pygame.draw.line(telaP, CorBranco, (BarraTempoX, BarraTempoY), (BolinhaX, BarraTempoY), BarraAltura)
 
     BolinhaCor = CorVerde
@@ -413,7 +425,7 @@ while Run:
 
     # Bolinha e Barra Vermelha e Verde
     mx, my = pygame.mouse.get_pos()
-    if TC == CorVerde and not Bolinha.collidepoint(mx, my) and not Arrastar and not Pausado:
+    if TC == CorVerde and not Bolinha.collidepoint(mx, my) and not Arrastar:
         if BarraTempoX <= mx <= BarraTempoX + BarraLargura:
             if BarraTempoY-15 <= my <= BarraTempoY + BarraAltura:
 
@@ -423,8 +435,6 @@ while Run:
 
     # Previa da musica
     PAM = BarraTempoX + (BarraLargura * (pos / T1))
-    PAM1 =  (int(PAM), BarraTempoY)
-    PAM2 =  (Bolinha.x + 20, BarraTempoY)
 
     if Arrastar:
         if BolinhaX < mx:
@@ -433,13 +443,15 @@ while Run:
             BolinhaCor = CorVerde
 
     if Arrastar:
-
         pygame.draw.rect(telaP, BolinhaCor, (int(PAM),posY-64, 10, 40), border_radius=15)
 
     # Aparencia da Bolinha
     if TC == CorVerde and not Pausado and Bolinha.collidepoint(mx, my) or Arrastar:
         pygame.draw.circle(telaP, CorCiano, (Bolinha.x + 20, posY - 45), 20)
         pygame.draw.circle(telaP, CorAzul, (Bolinha.x + 20, posY - 45), 15)
+
+    #elif Pausado:
+        #pygame.draw.circle(telaP, CorBranco, (Bolinha.x + 8, posY - 45), 20)
 
     elif not Arrastar:
         pygame.draw.circle(telaP, CorBranco, (BolinhaX, posY - 45), 20)
@@ -453,12 +465,12 @@ while Run:
 
     if PlayStop.collidepoint(mx1, my1) and TC == CorVerde:
         pygame.draw.rect(telaP, CorVerde, (10 + 6, 85 + 5, 86 - 12, 91 - 10), border_radius=10)
-    elif PlayStop.collidepoint(mx1, my1) and TC == CorVermelho:
+    elif PlayStop.collidepoint(mx1, my1) and TC == CorVermelho :
         pygame.draw.rect(telaP, CorVermelho, (10 + 6, 85 + 5, 86 - 12, 91 - 10), border_radius=10)
     else:
         pygame.draw.rect(telaP, CorCinza, PlayStop)
 
-    if Pausado == True:
+    if Pausado == True or TC == CorVermelho:
         pygame.draw.polygon(telaP, CorPreto,[(80 ,129),(27, 98),(27, 162)])
     elif Pausado == False:
         pygame.draw.line(telaP, CorPreto,(35, 100),(35, 160),20,)
