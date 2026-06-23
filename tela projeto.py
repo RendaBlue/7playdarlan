@@ -195,7 +195,7 @@ while Run:
             if PlayStop.collidepoint(mx, my):
                 BotaoPlay = False
 
-                if TempoDuracao <= 700:
+                if TempoDuracao <= 1000:
                     if TrocaCor == CorVermelho:
                         pygame.mixer.music.play()
                         TrocaCor = CorVerde
@@ -234,7 +234,7 @@ while Run:
         if evento.type == pygame.MOUSEWHEEL:
             Scroll -= evento.y * VelScroll
 
-            LimiteScroll = max(0, AlTrocaCoronteudo - posY + 270)
+            LimiteScroll = max(0, QuantiMusic - posY + 290)
             Scroll = max(0, min(Scroll, LimiteScroll))
 
         # Atulizar a Lista de Musica ==============================================
@@ -317,8 +317,8 @@ while Run:
     Tnome = re.sub(r'^[0-9.\- ]+', '', Tnome)
     RectMusic.clear()
     Tpy = 90 - Scroll
-    AlTrocaCoronteudo = len(musicas) * 46
-    Scroll = max(0, min(Scroll, AlTrocaCoronteudo - posY+270))
+    QuantiMusic = len(musicas) * 46
+    Scroll = max(0, min(Scroll, QuantiMusic - posY+290))
     for i, musica in enumerate(musicas):
         T2nome = os.path.splitext(os.path.basename(musica))[0]
         T2nome = re.sub(r'^[0-9.\- ]+', '', T2nome)
@@ -331,7 +331,7 @@ while Run:
             MusicCor = CorLaranja
             ObjetoCor = CorPreto
         ObjetoD2 = pygame.draw.rect(telaP, ObjetoCor, Objeto2)
-        TextoT2 = Fonte3.render(f"{i+1:03}. " + T2nome, True, MusicCor)
+        TextoT2 = Fonte3.render(f"{i+1:03}: " + T2nome, True, MusicCor)
         PosMusic = (120, Tpy+5)
         if 55 < Tpy < posY-100:
             telaP.blit(TextoT2, PosMusic)
@@ -449,29 +449,28 @@ while Run:
         pygame.draw.circle(telaP, CorBranco, (BolinhaX, posY - 45), 20)
 
 
-    # Aparecina e Sistema do botão Pause/Despause e Sstop/Play
+    # Aparecina e Sistema do botão Pause/Despause e Sstop/Play =========================
 
     mx1, my1 = pygame.mouse.get_pos()
-    TempoDuracao = (TempoDuracao / 700) * 81
-    TempoDuracao = min(TempoDuracao, 81)
+    TempoDuracao = (TempoDuracao / 1000) * 40
+    TempoDuracao = 2 + min(TempoDuracao, 40)
 
     if PlayStop.collidepoint(mx1, my1):
         if BotaoPlay and TrocaCor == CorVerde and TempoDuracao > 11:
-            pygame.draw.rect(telaP, CorVermelho, (16, 90, 74, TempoDuracao), border_radius=10)
+            pygame.draw.rect(telaP, CorVermelho,
+                             (16, 90 + (40 - TempoDuracao), 74, TempoDuracao * 2), border_radius=10)
         else:
             pygame.draw.rect(telaP, CorBranco, (16, 90, 74, 81), border_radius=10)
 
     if Pausado == True or TrocaCor == CorVermelho:
         pygame.draw.polygon(telaP, CorPreto,[(80 ,129),(27, 98),(27, 162)])
-    elif Pausado == False:
+    elif not Pausado:
         pygame.draw.line(telaP, CorPreto,(35, 100),(35, 160),20,)
         pygame.draw.line(telaP, CorPreto, (68, 100), (68, 160), 20)
 
-    # Sistema de stop ao segurar =======================================
-
     if BotaoPlay:
         TempoDuracao = pygame.time.get_ticks() - TempoPress
-        if TrocaCor == CorVerde and TempoDuracao >= 700:
+        if TrocaCor == CorVerde and TempoDuracao >= 1000:
             pygame.mixer.music.stop()
             pygame.mixer.music.unpause()
             Pausado = False
@@ -479,7 +478,7 @@ while Run:
             TempoInicial = 0
 
     # Nome da música atual =======================================
-    TextoMusic = Fonte.render(f"{(LM+1):03}. " + Tnome, True, CorBranco)
+    TextoMusic = Fonte.render(f"{(LM+1):03}: " + Tnome, True, CorBranco)
     TextoMusicCenter = TextoMusic.get_rect(center=(posX/2, 35))
     telaP.blit(TextoMusic, TextoMusicCenter)
 
