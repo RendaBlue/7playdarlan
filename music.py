@@ -1,77 +1,44 @@
 import pygame
-from mutagen.mp3 import MP3
+import math
 
 pygame.init()
 
-Tela = pygame.display.set_mode((800, 300))
-Clock = pygame.time.Clock()
+tela = pygame.display.set_mode((400, 300))
+pygame.display.set_caption("Ícone de Configurações")
 
-# Música
-Musica = "musica.mp3"
+BRANCO = (255, 255, 255)
+CINZA = (180, 180, 180)
+PRETO = (0, 0, 0)
 
-pygame.mixer.music.load(Musica)
-pygame.mixer.music.play()
+def desenhar_configuracao(superficie, x, y, raio):
+    # Dentes da engrenagem
+    for angulo in range(0, 360, 45):
+        rad = math.radians(angulo)
 
-# Duração total da música
-audio = MP3(Musica)
-Duracao = audio.info.length
+        x1 = x + math.cos(rad) * (raio - 5)
+        y1 = y + math.sin(rad) * (raio - 5)
 
-# Barra
-BarraX = 100
-BarraY = 200
-BarraLargura = 600
-BarraAltura = 20
+        x2 = x + math.cos(rad) * (raio + 10)
+        y2 = y + math.sin(rad) * (raio + 10)
 
-Rodando = True
+        pygame.draw.line(superficie, CINZA, (x1, y1), (x2, y2), 6)
 
-while Rodando:
+    # Corpo da engrenagem
+    pygame.draw.circle(superficie, CINZA, (x, y), raio)
 
-    for event in pygame.event.get():
+    # Furo central
+    pygame.draw.circle(superficie, PRETO, (x, y), raio // 3)
 
-        if event.type == pygame.QUIT:
-            Rodando = False
+rodando = True
+while rodando:
+    for evento in pygame.event.get():
+        if evento.type == pygame.QUIT:
+            rodando = False
 
-        # Clique na barra
-        if event.type == pygame.MOUSEBUTTONDOWN:
+    tela.fill(BRANCO)
 
-            mx, my = pygame.mouse.get_pos()
+    desenhar_configuracao(tela, 200, 150, 40)
 
-            if BarraX <= mx <= BarraX + BarraLargura:
-                if BarraY <= my <= BarraY + BarraAltura:
-
-                    # Porcentagem clicada
-                    porcentagem = (mx - BarraX) / BarraLargura
-
-                    # Tempo novo
-                    novo_tempo = Duracao * porcentagem
-
-                    # Toca a música nesse tempo
-                    pygame.mixer.music.play(start=novo_tempo)
-
-    Tela.fill((30, 30, 30))
-
-    # Tempo atual
-    tempo_atual = pygame.mixer.music.get_pos() / 1000
-
-    # Corrige caso fique negativo
-    tempo_atual = max(0, tempo_atual)
-
-    # Porcentagem atual
-    progresso = tempo_atual / Duracao
-
-    # Tamanho da barra preenchida
-    largura_preenchida = BarraLargura * progresso
-
-    # Barra vazia
-    pygame.draw.rect(Tela, (80, 80, 80),
-                     (BarraX, BarraY, BarraLargura, BarraAltura))
-
-    # Barra preenchida
-    pygame.draw.rect(Tela, (0, 200, 0),
-                     (BarraX, BarraY,
-                      largura_preenchida, BarraAltura))
-
-    pygame.display.update()
-    Clock.tick(60)
+    pygame.display.flip()
 
 pygame.quit()
