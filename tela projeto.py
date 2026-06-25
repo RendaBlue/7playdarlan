@@ -8,7 +8,6 @@ import unicodedata
 
 pygame.init()
 
-
 # ======================================================================================
 # Cores |-------------------------------------------------------------------------------
 # ======================================================================================
@@ -49,13 +48,8 @@ def normalizar(nome):
 
 def chave(x):
     nome = os.path.basename(x)
-
-    # remove números antes do ponto (003., 7-05., 38., etc)
     nome = re.sub(r"^\d+[\d\-\s]*\.\s*", "", nome)
-
-    # normaliza
     nome = normalizar(nome)
-
     return nome.strip()
 
 def carregar_musicas():
