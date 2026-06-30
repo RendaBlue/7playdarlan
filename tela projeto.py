@@ -72,8 +72,6 @@ pygame.mixer.music.load(musicas[LM])
 T1 = MP3(musicas[LM]).info.length
 RectMusic = []
 
-colunas = 3  # quantidade de colunas na linha
-
 for musica in musicas:
     nome = os.path.splitext(os.path.basename(musica))[0]
     nome = re.sub(r'^[0-9.\- ]+', '', nome)
@@ -96,11 +94,11 @@ Clock = pygame.time.Clock()
 # ===================================================================================
 
 Scroll = 0
-VelScroll = 30
+VelScroll = 50
+
+
 TempoDuracao = 0
 TempoPress = 0
-
-Interface = 0
 
 # Tempo de Barra
 BarraTempoX = 165 # incio
@@ -124,12 +122,15 @@ Infor = pygame.display.get_desktop_sizes()
 
 BotaoEncerrar = pygame.Rect(10, posY-175-3, 86, 91)
 PlayStop = pygame.Rect(10, 85, 86, 91)
-BAleatorio = pygame.Rect(10, 200, 86, 91)
-#pygame.draw.rect(telaP, CorVermelho, (PF[0], 265+45, PF[2], PF[3]))
-#pygame.draw.rect(telaP, CorBranco, (PF[0], 355+70, PF[2], PF[3]))
 ClickList = pygame.Rect(106, 85, posX-116, posY-170)
 Bolinha = pygame.Rect(BarraTempoX-20, BarraTempoY-20, 40, BarraAltura+20)
 BarraTTotal = pygame.Rect(BarraTempoX, BarraTempoY-15, BarraLargura, BarraAltura+15)
+
+def atualizar_scroll():
+    global LimiteScroll
+    AlturaItem = 50
+    AlturaLista = len(musicas) * AlturaItem
+    LimiteScroll = max(0, AlturaLista - ClickList.height)
 
 # ========================================================================================
 # Sistema |-------------------------------------------------------------------------------
@@ -152,6 +153,8 @@ while Run:
             BarraTTotal = pygame.Rect(BarraTempoX, BarraTempoY - 15, BarraLargura, BarraAltura + 15)
             Bolinha = pygame.Rect(BarraTempoX - 20, BarraTempoY - 20, 40, BarraAltura + 20)
             ClickList = pygame.Rect(106, 85, posX - 116, posY - 170)
+
+            atualizar_scroll()
 
 # ==========================================================================================================
 # -----| Mouse + Musica |-----------------------------------------------------------------------------------
@@ -251,21 +254,12 @@ while Run:
 
         if evento.type == pygame.MOUSEWHEEL:
             Scroll -= evento.y * VelScroll
-
-            LimiteScroll = max(0, QuantiMusic-430)
             Scroll = max(0, min(Scroll, LimiteScroll))
 
         # Atulizar a Lista de Musica ==============================================
 
         if evento.type == pygame.KEYDOWN and evento.key == pygame.K_r:
-            musicas = sorted(
-                [
-                    os.path.join(Pmusicas, musica)
-                    for musica in os.listdir(Pmusicas)
-                    if musica.endswith(".mp3")
-                ],
-                key=chave
-            )
+            musicas = carregar_musicas()
 
         # Escolher Musica Aleatorio ================================================
 
@@ -337,9 +331,11 @@ while Run:
     Tnome = os.path.splitext(os.path.basename(musicas[LM]))[0]
     Tnome = re.sub(r'^[0-9.\- ]+', '', Tnome)
     RectMusic.clear()
-    Tpy = 90 - Scroll
-    QuantiMusic = len(musicas) * 46
-    Scroll = max(0, min(Scroll, QuantiMusic-430))
+    AlturaItem = 50
+    Tpy = ClickList.y + 5 - Scroll
+    AlturaLista = len(musicas) * AlturaItem
+    LimiteScroll = max(0, AlturaLista - ClickList.height)
+    Scroll = max(0, min(Scroll, LimiteScroll))
     for i, musica in enumerate(musicas):
         T2nome = os.path.splitext(os.path.basename(musica))[0]
         T2nome = re.sub(r'^[0-9.\- ]+', '', T2nome)
@@ -357,7 +353,7 @@ while Run:
         if 55 < Tpy < posY-100:
             telaP.blit(TextoT2, PosMusic)
             RectMusic.append((Objeto2, i))
-        Tpy += 50
+        Tpy += AlturaItem
 
     # Sistema de Tempo da Musica
     if TrocaCor == CorVerde:
@@ -405,7 +401,7 @@ while Run:
     AlturaRect = 91
     Espaco = 1
 
-    for i in range(6):
+    for i in range(3):
         y = 85 + i * (AlturaRect + Espaco)
 
         pygame.draw.rect(
@@ -414,17 +410,8 @@ while Run:
             (10, y, 86, AlturaRect)
         )
         # Play/Stopp e Pause
-        # Musica Aleatorio
-        # Lista Favorita
-        # Organizar
-        # Musica Alvo
+        # Fila de Musica
         # Menu/Configuração
-
-    # Botao de Looop
-    #pygame.draw.circle(telaP, CorAmarelo, (54, 245), 30)
-    #pygame.draw.circle(telaP, CorCinza, (54, 245), 20)
-    #pygame.draw.line(telaP, CorCinza, (50, 250), (80, 275), 10)
-    #pygame.draw.polygon(telaP, CorAmarelo, [(70, 272), (50, 255), (45, 285)])
 
     # Barra de Tempo da Musica
     pygame.draw.line(telaP, CorCinza, (BarraTempoX, BarraTempoY), (BarraTempoX + BarraLargura, BarraTempoY), BarraAltura)
